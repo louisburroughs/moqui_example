@@ -8,38 +8,81 @@ MCP servers provide Copilot and other AI assistants with standardized access to 
 
 ## Available MCP Servers
 
-### 1. moqui-context-server.js
-**Purpose:** Project-wide context information
+### 1. moqui-agents-server.js
+
+**Purpose:** Discover and access the 27+ specialized agents in the Durion ERP ecosystem
+
+**Enhanced Tools:**
+
+- `list_agents` - Lists all available agents with optional filtering by name or expertise
+- `get_agent` - Returns full agent definition and expertise areas
+- `search_agents` - Search agents by keyword in name, description, or expertise
+- `get_agents_by_expertise` - Find agents specializing in specific areas (e.g., "aws", "i18n", "database")
+- `get_collaboration_framework` - Shows how agents collaborate and work together
+- `get_agent_description` - Legacy tool for backward compatibility
+
+**Example Usage:**
+
+```bash
+@moqui-agents-server list agents with AWS expertise
+@moqui-agents-server get aws-cloud-architect
+@moqui-agents-server search for agents related to internationalization
+```
+
+**Supported Agents:**
+
+- i18n-agent - Internationalization expert
+- typescript-agent - TypeScript/type safety expert
+- vue-agent - Vue.js 2.7 expert
+- quasar-agent - Quasar v1.22 component expert
+- architecture_agent - Chief Architect
+- moqui_developer_agent - Moqui implementation expert
+- aws-cloud-architect - AWS cloud deployment specialist
+- dba_agent - Database administration and performance
+- sre_agent - SRE/observability/metrics
+- api_agent - REST API development
+- And 17+ more specialized agents...
+
+### 2. mcp-instructions-server.js
+
+**Purpose:** Access coding instructions, guidelines, and best practices for the Durion ERP tech stack
 
 **Tools:**
-- `get_project_info` - Returns project metadata, components, agents, tech stack
-- `get_durion_components` - Lists all Durion business components
-- `get_technology_stack` - Detailed tech stack information (frontend, backend, database, devops)
 
-**Use Cases:**
-- Providing agents with project structure context
-- Understanding component organization
-- Technology compatibility checks
+- `list_instructions` - List all instruction sets with optional language filtering
+- `get_instructions` - Get the full instruction set for a language/framework
+- `list_prompts` - List all available prompts and templates
+- `get_prompt` - Get a specific prompt/template
+- `search_knowledge` - Search across agents, instructions, and prompts
+- `get_agent_collaboration` - Get agent collaboration patterns
+- `get_quick_reference` - Get quick reference guides for topics
 
-### 2. moqui-agents-server.js
-**Purpose:** Agent descriptions, relationships, and collaboration patterns
+**Example Usage:**
 
-**Tools:**
-- `list_agents` - Lists all available agents with descriptions
-- `get_agent_description` - Returns full agent documentation
-- `get_agent_relationships` - Shows how agents collaborate
-- `get_collaboration_framework` - Returns AGENT_COLLABORATION.md
+```bash
+@mcp-instructions-server get Java development guidelines
+@mcp-instructions-server get Groovy service patterns for Moqui
+@mcp-instructions-server search knowledge about Vue.js best practices
+@mcp-instructions-server get code review instructions
+```
 
-**Use Cases:**
-- Understanding agent roles and responsibilities
-- Agent-to-agent communication patterns
-- Workflow and escalation procedures
-- Finding the right agent for a task
+**Supported Instruction Sets:**
+
+- java.instructions - Java development standards
+- groovy.instructions - Groovy and Moqui service development (NEW)
+- java-mcp-server.instructions - Building MCP servers with Moqui integration (ENHANCED)
+- code-review-generic.instructions - Code review guidelines (updated for Moqui)
+- typescript-5-es2022.instructions - TypeScript development
+- vuejs3.instructions - Vue.js 3 best practices
+- quasar.instructions - Quasar framework guidelines
+- security-and-owasp.instructions - Security best practices
 
 ### 3. project-analysis-server.js
+
 **Purpose:** Component analysis, dependencies, and architecture
 
 **Tools:**
+
 - `list_durion_components` - Lists all Durion components with metadata
 - `get_component_info` - Returns component details (tier, description, entities, dependencies)
 - `get_component_dependencies` - Lists what a component depends on
@@ -47,10 +90,24 @@ MCP servers provide Copilot and other AI assistants with standardized access to 
 - `get_layering_rules` - Returns architectural layering rules and domain boundaries
 
 **Use Cases:**
+
 - Component dependency analysis
 - Architecture compliance checking
 - Cross-domain relationship validation
 - Service placement decisions
+
+### 4. awesome-copilot (Docker-based)
+
+**Purpose:** Access the awesome-copilot ecosystem with 118+ agents, prompts, and templates
+
+**Configuration:** Docker-based MCP server providing multi-language agent support
+
+**Example Usage:**
+
+```bash
+@awesome-copilot list javascript agents
+@awesome-copilot search for Python development patterns
+```
 
 ## Setup Instructions
 
@@ -64,48 +121,46 @@ npm install @modelcontextprotocol/sdk
 
 This is the **recommended** approach for Moqui development:
 
-1. **Edit VS Code Settings** (`Ctrl+Shift+P` → "Preferences: Open User Settings (JSON)"):
+1. **Edit VS Code Settings** (`.vscode/settings.json`):
    ```json
-   "chat.mcp.enabled": {
-     "moqui-context": {
-       "command": "node",
-       "args": ["/home/n541342/IdeaProjects/moqui_example/.github/mcp-servers/moqui-context-server.js"],
-       "env": {
-         "MOQUI_PROJECT_ROOT": "/home/n541342/IdeaProjects/moqui_example",
-         "MOQUI_COMPONENTS_PATH": "runtime/component",
-         "MOQUI_FRAMEWORK_PATH": "framework"
-       }
-     },
-     "moqui-agents": {
-       "command": "node",
-       "args": ["/home/n541342/IdeaProjects/moqui_example/.github/mcp-servers/moqui-agents-server.js"],
-       "env": {
-         "MOQUI_PROJECT_ROOT": "/home/n541342/IdeaProjects/moqui_example",
-         "AGENTS_PATH": ".github/agents",
-         "DOCUMENTATION_PATH": ".github/docs"
-       }
-     },
-     "project-analysis": {
-       "command": "node",
-       "args": ["/home/n541342/IdeaProjects/moqui_example/.github/mcp-servers/project-analysis-server.js"],
-       "env": {
-         "MOQUI_PROJECT_ROOT": "/home/n541342/IdeaProjects/moqui_example",
-         "DURION_COMPONENTS": "durion-common,durion-crm,durion-product,durion-inventory,durion-accounting,durion-workexec,durion-experience,durion-positivity,durion-theme,durion-demo-data,durion-mcp"
+   {
+     "mcp.servers": {
+       "moqui-agents-server": {
+         "command": "node",
+         "args": [".github/mcp-servers/moqui-agents-server.js"],
+         "disabled": false
+       },
+       "mcp-instructions-server": {
+         "command": "node",
+         "args": [".github/mcp-servers/mcp-instructions-server.js"],
+         "disabled": false
+       },
+       "project-analysis": {
+         "command": "node",
+         "args": [".github/mcp-servers/project-analysis-server.js"],
+         "disabled": false
+       },
+       "awesome-copilot": {
+         "command": "docker",
+         "args": ["run", "--rm", "-i", "awesome-copilot"],
+         "disabled": false
        }
      }
    }
    ```
 
-2. **Restart VS Code** to activate MCP servers
-
-3. **Open Copilot Chat** (Ctrl+Shift+I) and use:
-   ```
-   @moqui-agents list-agents
-   @moquiDeveloper-agent Help me understand Moqui entities
-   @api-agent Design a REST endpoint
+2. **Ensure MCP SDK is installed:**
+   ```bash
+   npm install @modelcontextprotocol/sdk
    ```
 
-See [COPILOT_MCP_INTEGRATION.md](../COPILOT_MCP_INTEGRATION.md) for complete usage guide.
+3. **Restart VS Code** to activate MCP servers
+
+4. **Open Copilot Chat** (Ctrl+Shift+I) and use:
+   ```
+   @moqui-agents-server list agents
+   @mcp-instructions-server get groovy.instructions
+   ```
 
 ### Installation with Claude Desktop
 
@@ -118,30 +173,25 @@ See [COPILOT_MCP_INTEGRATION.md](../COPILOT_MCP_INTEGRATION.md) for complete usa
    ```json
    {
      "mcpServers": {
-       "moqui-context": {
-         "command": "node",
-         "args": ["/path/to/mcp-servers/moqui-context-server.js"],
-         "env": {
-           "MOQUI_PROJECT_ROOT": "/home/n541342/IdeaProjects/moqui_example",
-           "MOQUI_COMPONENTS_PATH": "runtime/component",
-           "MOQUI_FRAMEWORK_PATH": "framework"
-         }
-       },
        "moqui-agents": {
          "command": "node",
          "args": ["/path/to/mcp-servers/moqui-agents-server.js"],
          "env": {
-           "MOQUI_PROJECT_ROOT": "/home/n541342/IdeaProjects/moqui_example",
-           "AGENTS_PATH": ".github/agents",
-           "DOCUMENTATION_PATH": ".github/docs"
+           "MOQUI_PROJECT_ROOT": "/home/n541342/IdeaProjects/moqui_example"
+         }
+       },
+       "mcp-instructions": {
+         "command": "node",
+         "args": ["/path/to/mcp-servers/mcp-instructions-server.js"],
+         "env": {
+           "MOQUI_PROJECT_ROOT": "/home/n541342/IdeaProjects/moqui_example"
          }
        },
        "project-analysis": {
          "command": "node",
          "args": ["/path/to/mcp-servers/project-analysis-server.js"],
          "env": {
-           "MOQUI_PROJECT_ROOT": "/home/n541342/IdeaProjects/moqui_example",
-           "DURION_COMPONENTS": "durion-common,durion-crm,durion-product,durion-inventory,durion-accounting,durion-workexec,durion-experience,durion-positivity,durion-theme,durion-demo-data,durion-mcp"
+           "MOQUI_PROJECT_ROOT": "/home/n541342/IdeaProjects/moqui_example"
          }
        }
      }
@@ -150,76 +200,87 @@ See [COPILOT_MCP_INTEGRATION.md](../COPILOT_MCP_INTEGRATION.md) for complete usa
 
 3. **Verify MCP servers are working:**
    ```bash
-   node .github/mcp-servers/moqui-context-server.js
-   # Should output: "Moqui Context MCP server running on stdio"
+   node .github/mcp-servers/moqui-agents-server.js
+   node .github/mcp-servers/mcp-instructions-server.js
    ```
 
 ## Usage Examples
 
-### Querying Project Information
+### Example 1: Find AWS Architecture Expertise
 
-**Request:**
-```json
-{
-  "method": "tools/call",
-  "params": {
-    "name": "get_project_info"
-  }
-}
+```
+User: @moqui-agents-server what agent helps with AWS?
+Response: Lists aws-cloud-architect with AWS cloud deployment specialty
+
+User: @moqui-agents-server get aws-cloud-architect
+Response: Full AWS architecture guidance, cost optimization, HA/DR patterns
 ```
 
-**Response:**
-```json
-{
-  "content": [{
-    "type": "text",
-    "text": "{...project metadata...}"
-  }]
-}
+### Example 2: Get Groovy Development Standards
+
+```
+User: @mcp-instructions-server how do I write Groovy services for Moqui?
+Response: Full groovy.instructions content with patterns, examples, and best practices
 ```
 
-### Getting Agent Information
+### Example 3: Find Security Guidelines
 
-**Request:**
-```json
-{
-  "method": "tools/call",
-  "params": {
-    "name": "get_agent_description",
-    "arguments": {
-      "agent": "moqui_developer_agent"
-    }
-  }
-}
+```
+User: @mcp-instructions-server search knowledge about security
+Response: Results from security-and-owasp.instructions, code-review guidelines, etc.
 ```
 
-### Analyzing Component Dependencies
+### Example 4: Discover Agents by Expertise
 
-**Request:**
-```json
-{
-  "method": "tools/call",
-  "params": {
-    "name": "get_component_dependencies",
-    "arguments": {
-      "component": "durion-crm"
-    }
-  }
-}
+```
+User: @moqui-agents-server show me agents with i18n expertise
+Response: Lists i18n-agent and language-specific agents
 ```
 
 ## Environment Variables
 
 All MCP servers read these environment variables:
 
-- `MOQUI_PROJECT_ROOT` - Root directory of the Moqui project
-- `MOQUI_COMPONENTS_PATH` - Path to components relative to root
-- `MOQUI_FRAMEWORK_PATH` - Path to framework relative to root
-- `AGENTS_PATH` - Path to agent definitions
-- `DOCUMENTATION_PATH` - Path to architecture documentation
-- `DURION_COMPONENTS` - Comma-separated list of Durion components
+- `MOQUI_PROJECT_ROOT` - Root directory of the Moqui project (default: `/home/n541342/IdeaProjects/moqui_example`)
+- `AGENTS_PATH` - Path to agent definitions relative to root (default: `.github/agents`)
+- `INSTRUCTIONS_PATH` - Path to instruction files relative to root (default: `.github/instructions`)
+- `PROMPTS_PATH` - Path to prompt templates relative to root (default: `.github/prompts`)
+- `DURION_COMPONENTS` - Comma-separated list of Durion components (for project-analysis-server)
 
 ## Extending MCP Servers
+
+### Adding a New Agent
+
+1. Create `.github/agents/my-agent.md` with YAML frontmatter:
+   ```yaml
+   ---
+   description: "What this agent does"
+   expertise: ["area1", "area2"]
+   collaborations: ["other-agent"]
+   ---
+   
+   # My Agent
+   ... detailed agent definition ...
+   ```
+
+2. Both servers will automatically discover it on next reload
+
+### Adding Instructions
+
+1. Create `.github/instructions/my-language.instructions.md` with:
+   ```yaml
+   ---
+   description: "Development guidelines"
+   applyTo: "**/*.ext"
+   ---
+   
+   # Guidelines
+   ... detailed instructions ...
+   ```
+
+2. The mcp-instructions-server will index it automatically
+
+### Creating New MCP Servers
 
 To add new tools to existing servers or create new servers:
 
@@ -229,53 +290,52 @@ To add new tools to existing servers or create new servers:
    const { Server } = require('@modelcontextprotocol/sdk/server/stdio.js');
    ```
 3. Implement `setRequestHandler` with your tools
-4. Update `.github/mcp-config.json` to register the new server
-5. Update your client config to use the new server
+4. Update `.vscode/settings.json` to register the new server
 
 ## Troubleshooting
 
-**Server won't start:**
-- Check Node.js version (requires 14+)
-- Verify environment variables are set correctly
-- Check file paths are absolute
+**MCP servers not connecting in Copilot Chat:**
+1. Verify `.vscode/settings.json` is valid JSON
+2. Check Node.js is installed: `node --version`
+3. Verify MCP SDK installed: `npm list @modelcontextprotocol/sdk`
+4. Restart VS Code: `Ctrl+Shift+P` → "Reload Window"
 
 **Tools not found:**
-- Ensure MCP config has correct command and args
-- Verify server process is running
-- Check tool names match exactly (case-sensitive)
+- Ensure `mcp.servers` section exists in `settings.json`
+- Verify server names match usage (e.g., `@moqui-agents-server`)
+- Check terminal output: View → Output → MCP
 
 **Missing data:**
-- Verify MOQUI_PROJECT_ROOT points to correct location
-- Check file paths for components and documentation
-- Ensure agent and architecture files exist
+- Verify `MOQUI_PROJECT_ROOT` points to correct location
+- Check agent files exist: `.github/agents/*.md`
+- Check instruction files exist: `.github/instructions/*.md`
+- Ensure YAML frontmatter is properly formatted (between `---` markers)
 
-### VS Code Specific Issues
+**awesome-copilot not responding:**
+1. Verify Docker installed: `docker --version`
+2. Check awesome-copilot image: `docker image ls | grep awesome`
+3. Test Docker: `docker run hello-world`
 
-**MCP servers not connecting in Copilot Chat:**
-1. Verify absolute paths in `settings.json` (not relative paths)
-2. Ensure Node.js is in your PATH: `which node`
-3. Check VS Code terminal for errors: View → Toggle Panel
-4. Restart VS Code completely: `Ctrl+Shift+P` → "Reload Window"
+## Performance Notes
 
-**@mcp-server not recognized:**
-1. Enable MCP servers: `chat.mcp.autostart: "newAndOutdated"`
-2. Allow MCP in settings: `chat.mcp.gallery.enabled: true`
-3. Ensure server names in `settings.json` match usage (e.g., `@moqui-agents`)
+- Agent/instruction files are loaded and cached on first use
+- Metadata extraction happens once per file  
+- Search operations use in-memory indexes
+- Results include file path for reference
+- Reload servers to pick up new agents/instructions
 
-## Future Enhancements
+## Security Considerations
 
-Potential MCP servers to add:
-
-- **moqui-entities-server.js** - Entity definition analysis and validation
-- **moqui-services-server.js** - Service definition lookup and relationships
-- **moqui-tests-server.js** - Test file analysis and coverage
-- **moqui-metrics-server.js** - Metrics and observability configuration
-- **moqui-api-server.js** - REST API endpoint documentation
+- MCP servers run with access to `.github/` directory contents
+- No sensitive data should be stored in agent/instruction files
+- Settings stored in `.vscode/settings.json` (committed to repo)
+- Docker-based awesome-copilot runs in isolated container
+- All file access is read-only
 
 ## References
 
-- [Model Context Protocol Documentation](https://modelcontextprotocol.io/)
-- [MCP SDK for JavaScript](https://github.com/modelcontextprotocol/typescript-sdk)
-- [Moqui Framework Documentation](https://www.moqui.org/)
-- [Agent Collaboration Framework](./../AGENT_COLLABORATION.md)
-- [Copilot MCP Integration Guide](../COPILOT_MCP_INTEGRATION.md)
+- [Model Context Protocol (MCP) Docs](https://modelcontextprotocol.io/)
+- [VS Code MCP Configuration](https://code.visualstudio.com/docs/copilot/mcp)
+- [GitHub Copilot Customization](https://docs.github.com/en/copilot/customization/)
+- [awesome-copilot Repository](https://github.com/github/awesome-copilot)
+- [MCP SDK for JavaScript](https://github.com/modelcontextprotocol/sdk-js)
